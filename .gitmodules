@@ -1,0 +1,9 @@
+[submodule "_sass/bulma"]
+	path = _sass/bulma
+	url = https://github.com/jgthms/bulma.git
+[submodule "xml/works"]
+	path = xml/works
+	url = https://github.com/BetaMasaheft/Works.git
+[submodule "assets/scripts/fuse"]
+	path = assets/scripts/fuse
+	url = https://github.com/krisk/Fuse.git
