@@ -12,6 +12,10 @@
   @include cv.generate-color-palette("primary", #d54b0a);
   @include cv.generate-on-scheme-colors("primary", #d54b0a, light.$scheme-main);
 
+  @include cv.register-hsl("link", #0787f5);
+  @include cv.generate-color-palette("link", #0787f5);
+  @include cv.generate-on-scheme-colors("link", #0787f5, light.$scheme-main);
+
   --bulma-navbar-breakpoint: iv.$mobile !important;
 }
 
