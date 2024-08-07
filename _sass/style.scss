@@ -1,0 +1,37 @@
+@use "bulma/sass/utilities/css-variables" as cv;
+
+@use "bulma/sass/themes/setup";
+@use "bulma/sass/themes/light";
+
+@import "bulma/bulma";
+
+@mixin light-theme-config {
+  @include light.light-theme;
+
+  @include cv.register-hsl("primary", #d54b0a);
+  @include cv.generate-color-palette("primary", #d54b0a);
+  @include cv.generate-on-scheme-colors("primary", #d54b0a, light.$scheme-main);
+
+  --bulma-navbar-breakpoint: iv.$mobile !important;
+}
+
+:root {
+  @include light-theme-config;
+  @include setup.setup-theme;
+}
+
+html,
+body {
+  table.table {
+    thead,
+    tbody,
+    tfoot {
+      border-color: var(--bulma-table-cell-border-color);
+      border-style: var(--bulma-table-cell-border-style);
+      border-width: 1px;
+    }
+    td {
+      border: 0;
+    }
+  }
+}

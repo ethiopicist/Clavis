@@ -1,0 +1,12 @@
+<nav class="pagination is-centered" role="navigation">
+  <ul class="pagination-list">
+    {% assign current_page = page.url | split: '/' | last | plus: 0 %}
+    {% if current_page == 0 %}{% assign current_page = 1 %}{% endif %}
+    {% assign previous_page_plus_one = 1 %}
+    {% for page_number in include.pagination %}
+    {% unless page_number == previous_page_plus_one %}<li><span class="pagination-ellipsis">&hellip;</span></li>{% endunless %}
+    <li><a href="{{ '/page/' | append: page_number | relative_url }}" class="pagination-link{% if page_number == current_page %} is-current{% endif %}">{{ page_number }}</a></li>
+    {% assign previous_page_plus_one = page_number | plus: 1 %}
+    {% endfor %}
+  </ul>
+</nav>

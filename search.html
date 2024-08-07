@@ -1,0 +1,110 @@
+---
+title: Clavis Search
+layout: default
+permalink: search/
+---
+
+<form id="search-form">
+  <div class="columns">
+    <div class="column is-2-widescreen is-3-tablet has-background-white-ter is-hidden-mobile"></div>
+    <div class="column is-10-widescreen is-9-tablet has-background-white-ter">
+      
+        <div class="field mb-3">
+          <div class="control">
+            <input id="title" class="input" type="text" placeholder="Title" />
+          </div>
+        </div>
+      
+        <div class="field mb-3">
+          <div class="control">
+            <textarea id="text" class="textarea" placeholder="Text" rows="2"></textarea>
+          </div>
+        </div>
+
+        <div class="field is-grouped is-pulled-right">
+          <div class="control">
+            <button class="button is-primary">Search</button>
+          </div>
+          <div class="control">
+            <button class="button is-warning" type="reset">Clear</button>
+          </div>
+        </div>
+
+    </div>
+  </div>
+
+  <div class="columns">
+    <div class="column is-2-widescreen is-3-tablet has-background-white-ter is-hidden-mobile">
+
+      <div class="field">
+        <label class="label">Keywords</label>
+        <div class="control">
+          <div class="select is-multiple">
+            <select id="keywords" multiple size="5">
+              {% for keyword in site.data.keywords %}
+              <option value="{{ keyword }}">{{ keyword }}</option>
+              {% endfor %}
+            </select>
+          </div>
+        </div>
+      </div>
+
+    </div>
+    <div class="column is-10-widescreen is-9-tablet">
+      <table id="results" class="table"></table>
+    </div>
+  </div>
+</form>
+
+<script src="{{ '/assets/scripts/jquery/jquery-3.7.1.min.js' | relative_url }}"></script>
+<script src="{{ '/assets/scripts/fuse/dist/fuse.min.js' | relative_url }}"></script>
+<script>
+$(document).ready(function() {
+
+  $('select#keywords option').each(function() {
+    $(this).text($(this).text().replace(/((?<=[a-z])[A-Z])/g, ' $1'));
+  });
+
+  $.getJSON('/work-index.json', function( data ) {
+
+    const fuse = new Fuse(data, {
+      includeScore: true,
+      keys: ['titles', 'keywords']
+    });
+
+    $('#search-form').on('reset', function() {
+
+      $('table#results').empty();
+
+    });
+
+    $('#search-form').on('submit', function() {
+
+      $('table#results').empty();
+
+      var search = $('#title').val();
+      var results = fuse.search(search).slice(0, 99);
+      
+      results.forEach(result => {
+        $('table#results').append(`
+<tbody>
+  <tr>
+    <td>
+      <a href="${result.item.url}">CAe&nbsp;<b>${result.item.clavis}</b></a>
+    </td>
+    <td>
+      <a href="${result.item.url}">${result.item.titles.join()}</a>
+    </td>
+  </tr>
+</tbody>
+`);
+      });
+
+      return false;
+
+    });
+
+  });
+
+});
+</script>

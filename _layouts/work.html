@@ -1,0 +1,22 @@
+---
+layout: default
+---
+<div class="content">
+  <h3 class="title is-4">Titles</h3>
+  <ul>
+    {% for title in page.titles %}
+    <li>{{ title }}</li>
+    {% endfor %}
+  </ul>
+
+  <h3 class="title is-4">Contributors</h3>
+  <ul>
+    {% for contributor in page.contributors %}
+    <li>{{ contributor.name }}, {{ contributor.role }}</li>
+    {% endfor %}
+  </ul>
+
+  <hr>
+
+  <a href="https://betamasaheft.eu/works/{{ page.betmas }}" target="_blank">See on Beta Maṣāḥəft</a>.
+</div>

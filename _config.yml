@@ -1,0 +1,13 @@
+title: Mazgaba Maṣāḥəft
+
+works_per_page: 50
+
+exclude:
+  - CNAME
+  - LICENSE
+  - README.md
+  - xml/
+  - assets/scripts/fuse/
+
+include:
+  - assets/scripts/fuse/dist/fuse.min.js

@@ -1,0 +1,30 @@
+---
+---
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>
+      {% if page.title %}{{ page.title | append: " | " }}{% endif %}
+      {{ site.title }}
+    </title>
+    <link rel="stylesheet" href="{{ '/assets/css/main.css' | relative_url }}">
+  </head>
+
+  <body>
+
+    {% include header.html %}
+
+    <section class="section">
+      <div class="container">
+        
+        {{ content }}
+
+      </div>
+    </section>
+
+    {% include footer.html %}
+
+  </body>
+</html>
