@@ -2,7 +2,7 @@
   <div class="container">
     <div class="navbar-menu">
       <div class="navbar-start">
-        <a class="navbar-item" href="{{ site.url }}">Clavis</a>{% comment %}
+        <a class="navbar-item" href="{% link index.html %}">Clavis</a>{% comment %}
         <a class="navbar-item">Manuscripts</a>{% endcomment %}
         <a class="navbar-item" href="{% link search.html %}">Search</a>
       </div>
@@ -12,7 +12,7 @@
 
 <section class="hero is-primary is-small">
   <div class="hero-body container">
-    <a href="{{ site.url }}"><h1 class="title is-2">{{ site.title }}</h1></a>
+    <a href="{% link index.html %}"><h1 class="title is-2">{{ site.title }}</h1></a>
     {% if page.title %}<h2 class="subtitle is-4">{{ page.title }}</h2>{% endif %}
   </div>
 </section>
