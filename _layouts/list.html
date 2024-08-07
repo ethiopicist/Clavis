@@ -10,34 +10,40 @@ layout: default
 
 <div class="level">
 
-  <div clas="level-item">
-    <form id="lookup">
-      <div class="field has-addons">
-        <div class="control">
-          <input class="input" type="number" max="{{ site.data.works.last.clavis }}" placeholder="CAe #" style="width: 5.25em;">
-        </div>
-        <div class="control">
-          <button class="button is-link" type="submit">Lookup</button>
-        </div>
+  <form id="lookup">
+    <div class="field has-addons">
+      <div class="control">
+        <input class="input" type="number" max="{{ site.data.works.last.clavis }}" placeholder="CAe #" style="width: 5.25em;">
       </div>
-    </form>
-  </div>
+      <div class="control">
+        <button class="button is-link" type="submit">Lookup</button>
+      </div>
+    </div>
+  </form>
 
-  <div class="level-item">
+  <div class="is-hidden-mobile">
     {% include pagination.html pagination=page.pagination %}
   </div>
 
-  <div clas="level-item">
-    <form id="goto">
-      <div class="field has-addons">
-        <div class="control">
-          <input class="input" type="number" min="1" max="{{ page.pagination.last }}" placeholder="Page #" style="width: 5em;">
-        </div>
-        <div class="control">
-          <button class="button is-link" type="submit">Go</button>
-        </div>
+  <form id="goto">
+    <div class="field has-addons">
+      <div class="control">
+        <input class="input" type="number" min="1" max="{{ page.pagination.last }}" placeholder="Page #" style="width: 5.25em;">
       </div>
-    </form>
+      <div class="control">
+        <button class="button is-link" type="submit">Go</button>
+      </div>
+    </div>
+  </form>
+
+  <div class="is-hidden-tablet">
+    {% assign prev_page = page.url | split: '/' | last | minus: 1 %}
+    {% assign next_page = page.url | split: '/' | last | plus: 1 %}
+    {% if next_page == 1 %}{% assign next_page = 2 %}{% endif %}
+    <nav class="pagination is-centered" role="navigation">
+      <a href="{% unless prev_page < 1 %}{{ '/page/' | append: prev_page | relative_url }}{% endunless %}" class="pagination-previous" {% if prev_page < 1 %}disabled{% endif %}>Prev</a>
+      <a href="{% unless next_page > page.pagination.last %}{{ '/page/' | append: next_page | relative_url }}{% endunless %}" class="pagination-next" {% if next_page > page.pagination.last %}disabled{% endif %}>Next</a>
+    </nav>
   </div>
 
 </div>
@@ -45,7 +51,10 @@ layout: default
 <table class="table is-fullwidth mt-4 mb-4">
   <thead>
     <tr>
-      <th>Identifiers</th>
+      <th>
+        <span class="is-hidden-mobile">Identifiers</span>
+        <span class="is-hidden-tablet">CAe&nbsp;#</span>
+      </th>
       <th>Primary Title</th>
     </tr>
   </thead>
@@ -53,9 +62,11 @@ layout: default
   <tbody>
     <tr>
       <td rowspan="2">
-        <a href="{{ work.url | relative_url }}">CAe&nbsp;<b>{{ work.clavis }}</b></a>
-        <br>
-        <small><b>BM/</b>{{ work.betmas }}</small>
+        <a href="{{ work.url | relative_url }}" style="display: block; white-space: nowrap;">
+          <span class="is-hidden-mobile">CAe</span>
+          <b>{{ work.clavis }}</b>
+        </a>
+        <small class="is-hidden-mobile"><b>BM/</b>{{ work.betmas }}</small>
       </td>
       <td>
         <a href="{{ work.url | relative_url }}">{{ work.titles | join }}</a>
@@ -75,7 +86,10 @@ layout: default
   {% endfor %}
   <tfoot>
     <tr>
-      <th>Identifiers</th>
+      <th>
+        <span class="is-hidden-mobile">Identifiers</span>
+        <span class="is-hidden-tablet">CAe&nbsp;#</span>
+      </th>
       <th>Primary Title</th>
     </tr>
   </tfoot>
