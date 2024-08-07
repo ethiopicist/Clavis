@@ -31,7 +31,7 @@ module TEI
 
           work["keywords"] = doc.xpath('xmlns:TEI/xmlns:teiHeader/xmlns:profileDesc/xmlns:textClass/xmlns:keywords/xmlns:term/@key').map(&:to_s)
           site.data['keywords'] = site.data['keywords'].concat(work["keywords"]).uniq.sort
-          work["keywords"] = work["keywords"].map{|keyword| keyword.gsub(/((?<=[a-z])[A-Z])/, ' \1')}
+          #work["keywords"] = work["keywords"].map{|keyword| keyword.gsub(/((?<=[a-z])[A-Z])/, ' \1')}
 
           work["contributors"] = []
           doc.xpath('xmlns:TEI/xmlns:teiHeader/xmlns:fileDesc/xmlns:titleStmt/xmlns:editor').each do |editor|
@@ -94,8 +94,8 @@ module TEI
         site.pages << Jekyll::PageWithoutAFile.new(site, site.source, "keywords/#{keyword.downcase}", "index.html").tap do |file|
 
           file.data['layout'] = 'list'
-          file.data['keyword'] = keyword.gsub(/((?<=[a-z])[A-Z])/, ' \1')
-          file.data['title'] = "Keyword: #{file.data['keyword']}"
+          file.data['keyword'] = keyword
+          file.data['title'] = "Keyword: #{file.data['keyword'].gsub(/((?<=[a-z])[A-Z])/, ' \1')}"
 
         end
       end

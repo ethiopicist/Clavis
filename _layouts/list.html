@@ -66,7 +66,7 @@ layout: default
         {% if work.keywords.size > 0 %}
         <small>Keywords:</small>
         {% for keyword in work.keywords %}
-        <a href="{{ '/keywords/' | append: keyword | replace: ' ' , ''| downcase | relative_url }}">{{ keyword }}</a>{% unless forloop.last %},{% endunless %}
+        <a href="{{ '/keywords/' | append: keyword | downcase | relative_url }}">{{ keyword | uncamelize }}</a>{% unless forloop.last %},{% endunless %}
         {% endfor %}
         {% endif %}
       </td>

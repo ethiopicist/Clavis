@@ -38,4 +38,7 @@ body {
       border: 0;
     }
   }
+  [disabled] {
+    cursor: not-allowed;
+  }
 }
