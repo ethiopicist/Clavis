@@ -3,6 +3,7 @@ require 'nokogiri'
 module TEI
 
   class Generator < Jekyll::Generator
+    priority :highest
     def generate(site)
 
       xml_dir = site.dest.to_s.gsub(/_site/, 'xml/works')
@@ -19,20 +20,45 @@ module TEI
           work["clavis"] = doc.xpath('xmlns:TEI/@xml:id').to_s.gsub(/LIT(\d{4}).+/, '\1')
           work["betmas"] = doc.xpath('xmlns:TEI/@xml:id').to_s
           work["url"] = "works/#{work['clavis']}/"
+          work["description"] = doc.xpath('xmlns:TEI/xmlns:teiHeader/xmlns:profileDesc/xmlns:abstract/xmlns:p').to_s
 
           work["titles"] = []
-  
-          #doc.xpath('xmlns:TEI/xmlns:teiHeader/xmlns:fileDesc/xmlns:titleStmt/xmlns:title[@xml:id]').each do |title|
-          doc.xpath('xmlns:TEI/xmlns:teiHeader/xmlns:fileDesc/xmlns:titleStmt/xmlns:title').each do |title|
-  
-            work["titles"].push(title.xpath('./text()').to_s)
-  
+          # TITLES
+          doc.xpath('xmlns:TEI/xmlns:teiHeader/xmlns:fileDesc/xmlns:titleStmt/xmlns:title[@xml:id]/@xml:id').each do |id|
+            title = doc.xpath('xmlns:TEI/xmlns:teiHeader/xmlns:fileDesc/xmlns:titleStmt/xmlns:title[@xml:id="'+id+'" or @corresp="#'+id+'"]').map do |title|
+              if title.xpath('@xml:lang').any? && title.xpath('@type').to_s == "normalized"
+                { "#{title.xpath('@xml:lang').to_s}-latn" => title.xpath('./text()').to_s }
+              elsif title.xpath('@xml:lang').any?
+                { title.xpath('@xml:lang').to_s => title.xpath('./text()').to_s }
+              else
+                { nil => title.xpath('./text()').to_s }
+              end
+            end
+            work["titles"].push(title.reduce({}, :merge))
           end
 
+          unless work["titles"].any?
+            work["titles"] = doc.xpath('xmlns:TEI/xmlns:teiHeader/xmlns:fileDesc/xmlns:titleStmt/xmlns:title').map{ |title| { nil => title.xpath('./text()').to_s } }
+          end
+          work["searchable_titles"] = work["titles"].flat_map(&:values).join(' ')
+
+          # REVISION HISTORY
+          work["revisions"] = doc.xpath('xmlns:TEI/xmlns:teiHeader/xmlns:revisionDesc/xmlns:change').map do |revision|
+            {
+              "person" => site.data['contributors'][revision.xpath('@who').to_s],
+              "date" => revision.xpath('@when').to_s,
+              "change" => revision.xpath('text()').to_s
+            }
+          end
+
+          # FORMER IDS
+          work["formerly"] = doc.xpath('xmlns:TEI/xmlns:text//xmlns:listRelation/xmlns:relation[@name="betmas:formerlyAlsoListedAs"]').map{|relation| relation.xpath('@passive').to_s.gsub(/LIT(\d{4}).+/, '\1')}
+
+          # KEYWORDS
           work["keywords"] = doc.xpath('xmlns:TEI/xmlns:teiHeader/xmlns:profileDesc/xmlns:textClass/xmlns:keywords/xmlns:term/@key').map(&:to_s)
           site.data['keywords'] = site.data['keywords'].concat(work["keywords"]).uniq.sort
-          #work["keywords"] = work["keywords"].map{|keyword| keyword.gsub(/((?<=[a-z])[A-Z])/, ' \1')}
 
+          # CONTRIBUTORS
           work["contributors"] = []
           doc.xpath('xmlns:TEI/xmlns:teiHeader/xmlns:fileDesc/xmlns:titleStmt/xmlns:editor').each do |editor|
             role = editor.xpath('@role').to_s
@@ -60,6 +86,18 @@ module TEI
             file.data.merge!(work)
   
           end
+
+          # create redirects for former works
+          work["formerly"].each do |former|
+
+            site.pages << Jekyll::PageWithoutAFile.new(site, site.source, "works/#{former}", "index.html").tap do |file|
+  
+              file.data['layout'] = 'redirect'
+              file.data['redirect'] = work['url']
+    
+            end
+
+          end
   
           # add to sitewide data
           site.data['works'] = site.data['works'].push(work)
@@ -68,55 +106,7 @@ module TEI
 
       end
 
-      # paginate all works
-      per_page = Jekyll.configuration({})['works_per_page']
-      last_page = site.data['works'].size / per_page + 1
-      site.data['works'].sort_by! { |work| work['clavis']}
-
-      for page in 1..last_page
-        
-        site.pages << Jekyll::PageWithoutAFile.new(site, site.source, "page/#{page}", "index.html").tap do |file|
-
-          first_in_page = (page - 1) * per_page
-  
-          file.data['layout'] = 'list'
-          file.data['title'] = 'Clavis'
-          file.data['works'] = site.data['works'].slice(first_in_page, per_page)
-          file.data['pagination'] = paginate(page, last_page)
-
-          if page == 1 then site.pages << Jekyll::PageWithoutAFile.new(site, site.source, "/", "index.html").tap {|index| index.data.merge!(file.data)} end
-
-        end
-
-      end
-
-      site.data['keywords'].each do |keyword|
-        site.pages << Jekyll::PageWithoutAFile.new(site, site.source, "keywords/#{keyword.downcase}", "index.html").tap do |file|
-
-          file.data['layout'] = 'list'
-          file.data['keyword'] = keyword
-          file.data['title'] = "Keyword: #{file.data['keyword'].gsub(/((?<=[a-z])[A-Z])/, ' \1')}"
-
-        end
-      end
-
     end
   end
 
-end
-
-def paginate(page, last_page)
-  pagination = [1, last_page]
-          
-  if (page - 2) > 1 then pagination.push(page - 2) else pagination.push(page + 3) end
-  if (page - 1) > 1 then pagination.push(page - 1) else pagination.push(page + 4) end
-  
-  if page == 1 then pagination.push(page + 5) end
-  unless page == 1 or page == last_page then pagination.push(page) end
-  if page == last_page then pagination.push(page - 5) end
-
-  if (page + 1) < last_page then pagination.push(page + 1) else pagination.push(page - 4) end
-  if (page + 2) < last_page then pagination.push(page + 2) else pagination.push(page - 3) end
-
-  return pagination.sort
 end

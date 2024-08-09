@@ -1,29 +1,94 @@
 ---
 layout: default
 ---
-<div class="content">
-  <h3 class="title is-4">Titles</h3>
-  <ul>
-    {% for title in page.titles %}
-    <li>{{ title }}</li>
-    {% endfor %}
-  </ul>
 
-  <h3 class="title is-4">Contributors</h3>
-  <ul>
-    {% for contributor in page.contributors %}
-    <li>{{ contributor.name }}, {{ contributor.role }}</li>
-    {% endfor %}
-  </ul>
+<div class="columns">
 
-  {% if page.keywords.size > 0 %}
-  <b>Keywords:</b>
-  {% for keyword in page.keywords %}
-  <a href="{{ '/keywords/' | append: keyword | downcase | relative_url }}">{{ keyword | uncamelize }}</a>{% unless forloop.last %},{% endunless %}
-  {% endfor %}
-  {% endif %}
+  <main class="column">
 
-  <hr>
+    <article class="content">
+      <h3 class="title is-3" id="titles">Title{% if page.titles.size > 1 %}s{% endif %}</h3>
+      <ul>
+        {% for title in page.titles %}
+        <li>
+          {% for hash in title %}
+          <span lang="{{ hash[0] }}">{{ hash[1] }}</span>{% unless forloop.last %},{% endunless %}
+          {% endfor %}
+        </li>
+        {% endfor %}
+      </ul>
 
-  <a href="https://betamasaheft.eu/works/{{ page.betmas }}" target="_blank">See on Beta Maṣāḥəft</a>.
+      {% if page.description != "" %}
+      <h3 class="title is-3" id="description">Description</h3>
+      <p>{{ page.description | strip_html }}</p>
+      {% endif %}
+
+      <div class="columns is-multiline is-divided" style="margin-top: 1.3333em;">
+
+        <div class="column is-full-touch">
+          <h3 class="title is-3" id="contributors">Contributors</h3>
+          <ul>
+            {% for contributor in page.contributors %}
+            <li>{{ contributor.name }}, {{ contributor.role }}</li>
+            {% endfor %}
+          </ul>
+        </div>
+
+        <div class="column is-full-touch">
+          <h3 class="title is-3" id="history">History</h3>
+          {% if page.formerly.size > 0 %}
+          <p>
+            <b>Former clavis numbers:</b>
+            {% for id in page.formerly %}
+            {{id}}{% unless forloop.last %},{% endunless %}
+            {% endfor %}
+          </p>
+          {% endif %}
+          <ul>
+            {% assign sorted_revisions = page.revisions | sort: "date" | reverse %}
+            {% for revision in sorted_revisions %}
+            <li>
+              <span>{{ revision.person }} on <time datetime="{{ revision.date | date_to_xmlschema }}">{{ revision.date | date: "%-d.%m.%Y" }}</time>:</span>
+              <br>
+              <span>{{ revision.change }}</span>
+            </li>
+            {% endfor %}
+          </ul>
+        </div>
+
+    </article>
+
+  </main>
+
+  <div class="column is-3">
+
+    {% if page.keywords.size > 0 %}
+    <div class="message is-primary mb-3">
+      <div class="message-header">
+        <span>Keywords</span>
+      </div>
+      <div class="message-body">
+        <div class="tags">
+          {% for keyword in page.keywords %}
+          <a class="tag" href="{{ '/keywords/' | append: keyword | downcase | relative_url }}">{{ keyword | uncamelize }}</a>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+    {% endif %}
+
+    <div class="message is-primary">
+      <div class="message-header">
+        <span>Links</span>
+      </div>
+      <div class="message-body">
+        <div class="tags">
+          <a class="tag is-medium is-primary" href="https://betamasaheft.eu/works/{{ page.betmas }}" target="_blank">Beta maṣāḥəft</a>
+          <a class="tag is-medium is-dark" href="https://github.com/BetaMasaheft/works/blob/master/{{ page.clavis | minus: 1 | divided_by: 1000 | times: 1000 | plus: 1 }}-{{ page.clavis | minus: 1 | divided_by: 1000 | plus: 1 | times: 1000 }}/{{ page.betmas }}.xml" target="_blank">GitHub</a>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
 </div>

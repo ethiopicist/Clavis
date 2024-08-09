@@ -13,7 +13,7 @@ layout: default
   <form id="lookup">
     <div class="field has-addons">
       <div class="control">
-        <input class="input" type="number" max="{{ site.data.works.last.clavis }}" placeholder="CAe #" style="width: 5.25em;">
+        <input class="input" type="number" min="1" max="{{ site.data.works.last.clavis }}" placeholder="CAe #" style="width: 5.5em;">
       </div>
       <div class="control">
         <button class="button is-link" type="submit">Lookup</button>
@@ -28,7 +28,7 @@ layout: default
   <form id="goto">
     <div class="field has-addons">
       <div class="control">
-        <input class="input" type="number" min="1" max="{{ page.pagination.last }}" placeholder="Page #" style="width: 5.25em;">
+        <input class="input" type="number" min="1" max="{{ page.pagination.last }}" placeholder="Page #" style="width: 5.5em;">
       </div>
       <div class="control">
         <button class="button is-link" type="submit">Go</button>
@@ -69,16 +69,22 @@ layout: default
         <small class="is-hidden-mobile"><b>BM/</b>{{ work.betmas }}</small>
       </td>
       <td>
-        <a href="{{ work.url | relative_url }}">{{ work.titles | join }}</a>
+        <a href="{{ work.url | relative_url }}">
+          {% for hash in work.titles[0] %}
+          <span lang="{{ hash[0] }}">{{ hash[1] }}</span>{% unless forloop.last %},{% endunless %}
+          {% endfor %}
+        </a>
       </td>
     </tr>
     <tr>
       <td>
         {% if work.keywords.size > 0 %}
         <small>Keywords:</small>
+        <div class="tags" style="display: inline-block;">
         {% for keyword in work.keywords %}
-        <a href="{{ '/keywords/' | append: keyword | downcase | relative_url }}">{{ keyword | uncamelize }}</a>{% unless forloop.last %},{% endunless %}
+        <a class="tag" href="{{ '/keywords/' | append: keyword | downcase | relative_url }}">{{ keyword | uncamelize }}</a>
         {% endfor %}
+        </div>
         {% endif %}
       </td>
     </tr>
@@ -101,12 +107,14 @@ layout: default
 document.getElementById('lookup').addEventListener('submit', e => {
   e.preventDefault();
   const CAe = document.querySelector('#lookup input').value.padStart(4, '0');
-  window.location = `/works/${CAe}/`;
+  
+  if (CAe > 0 && CAe <= {{ site.data.works.last.clavis }}) window.location = `/works/${CAe}/`;
 });
 
 document.getElementById('goto').addEventListener('submit', e => {
   e.preventDefault();
   const page = document.querySelector('#goto input').value;
-  window.location = `/page/${page}/`;
+  
+  if (page > 0 && page <= {{ page.pagination.last }}) window.location = `/page/${page}/`;
 });
 </script>

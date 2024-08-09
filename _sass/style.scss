@@ -3,6 +3,8 @@
 @use "bulma/sass/themes/setup";
 @use "bulma/sass/themes/light";
 
+@use "bulma/sass/utilities/mixins";
+
 @import "bulma/bulma";
 
 @mixin light-theme-config {
@@ -26,6 +28,7 @@
 
 html,
 body {
+
   table.table {
     thead,
     tbody,
@@ -38,7 +41,21 @@ body {
       border: 0;
     }
   }
+
+  .columns.is-divided .column:not(:last-child) {
+    @include mixins.desktop {
+      border-right-color: var(--bulma-hr-background-color);
+      border-right-width: var(--bulma-hr-height);
+      border-right-style: solid;
+    }
+  }
+
+  [lang$="-latn"] {
+    font-style: italic;
+  }
+
   [disabled] {
     cursor: not-allowed;
   }
+
 }
